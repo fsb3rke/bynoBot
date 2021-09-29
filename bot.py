@@ -84,7 +84,32 @@ while True:
                 asd = i.replace("\n", "")
                 self.mutedList.append(asd)
         def addUser(self, userID):
-            self.mutedList.append(userID)
+            file = open("alreadymutedusersList.comaz", "a")
+            file.write(userID+"\n")
+            file.close()
+        def deleteUser(self, userID):
+            neList = []
+            asd = ""
+            bumbek = 0
+            file = open("alreadymutedusersList.comaz", "r")
+            for i in file:
+                if i != "\n":
+                    bumbek += 1
+            file.close()
+            file = open("alreadymutedusersList.comaz", "r")
+            for i in range(bumbek):
+                neList.append(file.readline())
+            file.close()
+            bumbik = []
+            for i in neList:
+                if i == userID:
+                    bumbik.append(i.replace(userID, ""))
+                else:
+                    bumbik.append(i)
+            file = open("alreadymutedusersList.comaz", "w")
+            for i in bumbik:
+                file.write(i+"\n")
+            file.close()
         def getUsers(self):
             return self.mutedList
     print(mutedUsers().getUsers())
@@ -95,8 +120,10 @@ while True:
     elif asda.startswith(prefix().getPrefix()+"getprefix"):
         buasz = asda.replace(prefix().getPrefix()+"getprefix", "")
         print(prefix().getPrefix())
+    elif asda.startswith(prefix().getPrefix()+"getmutedlist"):
+        print(mutedUsers().getUsers())
     else:
-        commands = [prefix().getPrefix()+"ban", prefix().getPrefix()+"mute", prefix().getPrefix()+"warn"]
+        commands = [prefix().getPrefix()+"ban", prefix().getPrefix()+"mute", prefix().getPrefix()+"warn", prefix().getPrefix()+"unmute"]
         file = open("botcommand.comaz", "w")
         asd = asda.replace(" ", "\n")
         bumbe = asd.replace("_", " ")
@@ -119,19 +146,27 @@ while True:
         command.append(vindak[0])
         id.append(vindak[1])
         reason.append(vindak[2])
-        if command[0] == prefix().getPrefix()+"ban":
-            print(f"""
+        print(reason[0])
+        if command[0] == commands[0]:
+            if reason[0] != "":
+                print(f"""
 ---
 |✔| {id[0]} was banned | {reason[0]}
 ---
-            """)
-        elif command[0] == prefix().getPrefix()+"mute":
+                """)
+            else:
+                print(f"""
+---
+|✔| {id[0]} was banned | No reason given
+---
+                """)    
+        elif command[0] == commands[1]:
             for i in mutedUsers().getUsers():
                 print(i)
                 if id[0] == i:
-                    playerprefs("isMuted").savebool(False)
-                else:
                     playerprefs("isMuted").savebool(True)
+                else:
+                    playerprefs("isMuted").savebool(False)
             print(playerprefs("isMuted").getbool())
             if playerprefs("isMuted").getbool():
                 print(f"""
@@ -140,17 +175,40 @@ while True:
 -----
                 """)
             else:
-                print(f"""
+                if reason[0] != "":
+                    print(f"""
 ---
 |✔| {id[0]} was muted | {reason[0]}
 ---
-                """)
-        elif command[0] == prefix().getPrefix()+"warn":
-            print(f"""
+                    """)
+                else:
+                    print(f"""
+---
+|✔| {id[0]} was muted | No reason given
+---
+                    """)
+            mutedUsers().addUser(id[0])
+        elif command[0] == commands[2]:
+            if reason[0] == None:
+                print(f"""
 ---
 |✔| {id[0]} was warned | {reason[0]}
 ---
-            """)
+                """)
+            elif reason[0] == "":
+                print(f"""
+---
+|✔| {id[0]} was warned | No reason given
+---
+                """)
+        elif command[0] == commands[3]:
+            mutedUsers().deleteUser(id[0])
+            if reason[0] != "":
+                print(f"""
+---
+|✔| {id[0]} unmuted
+---
+""")    
         else:
             print("prefix: "+prefix().getPrefix())
         print(bumbez)
